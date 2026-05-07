@@ -1,58 +1,409 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Dungeon Duel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Over het project
 
-## About Laravel
+Dungeon Duel is een turn-based multiplayer fantasy battle game gebouwd met Laravel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Twee spelers nemen het tegen elkaar op in een arena en vallen elkaar om de beurt aan met:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* melee attacks
+* spells
+* defense abilities
+* items en potions
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Het spel is geïnspireerd door games zoals:
 
-## Learning Laravel
+* Swords and Sandals 2
+* Pokémon
+* Raid: Shadow Legends
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Maar dan als een eenvoudige web-based dungeon battle game.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+# Features
 
-## Agentic Development
+## Multiplayer Turn-Based Combat
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Spelers spelen om de beurt.
 
-```bash
-composer require laravel/boost --dev
+Tijdens een beurt kan een speler:
 
-php artisan boost:install
+* Attack uitvoeren
+* Heavy attack gebruiken
+* Defend activeren
+* Spell casten
+* Potion gebruiken
+* Turn beëindigen
+
+---
+
+# Character Classes
+
+## Warrior
+
+Sterke melee fighter met veel HP.
+
+### Abilities
+
+* Slash
+* Rage Strike
+* Shield Block
+
+---
+
+## Mage
+
+Hoge magic damage maar weinig defense.
+
+### Abilities
+
+* Fireball
+* Ice Blast
+* Lightning Bolt
+
+---
+
+## Rogue
+
+Snelle assassin met critical hit chance.
+
+### Abilities
+
+* Backstab
+* Poison Knife
+* Dodge
+
+---
+
+## Paladin
+
+Balanced class met healing abilities.
+
+### Abilities
+
+* Holy Strike
+* Heal
+* Protection
+
+---
+
+# Combat System
+
+## Stats
+
+Iedere speler heeft:
+
+| Stat        | Beschrijving          |
+| ----------- | --------------------- |
+| HP          | Health points         |
+| Mana        | Magic points          |
+| Strength    | Physical damage       |
+| Defense     | Damage reduction      |
+| Crit Chance | Kans op critical hits |
+| Speed       | Bepaalt wie begint    |
+
+---
+
+# Status Effects
+
+| Effect | Beschrijving        |
+| ------ | ------------------- |
+| Burn   | Damage over time    |
+| Poison | Damage per beurt    |
+| Shield | Verminderde damage  |
+| Stun   | Skip volgende beurt |
+
+---
+
+# Battle Arena
+
+De game speelt zich af in verschillende fantasy arena’s.
+
+Voorbeelden:
+
+* Dungeon
+* Lava Cave
+* Forest Temple
+* Colosseum
+
+Elke arena heeft:
+
+* unieke achtergrond
+* visuele effecten
+* sfeeranimaties
+
+---
+
+# UI Features
+
+## Battle Screen
+
+De battle screen bevat:
+
+* player sprites
+* health bars
+* mana bars
+* action buttons
+* battle log
+* spell effects
+
+---
+
+# Battle Log
+
+Voorbeeld:
+
+```txt
+Mage casts Fireball
+Warrior takes 18 damage
+Warrior is burning
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+# Tech Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Backend
 
-## Code of Conduct
+* Laravel
+* PHP
+* MySQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Frontend
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* Blade
+* TailwindCSS
+* Alpine.js
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Database Structuur
+
+## users
+
+Laravel authentication users.
+
+---
+
+## games
+
+Slaat actieve matches op.
+
+| Kolom        | Beschrijving                 |
+| ------------ | ---------------------------- |
+| id           | Game ID                      |
+| status       | waiting / active / finished  |
+| current_turn | Welke speler aan de beurt is |
+| winner_id    | Winnaar van de match         |
+
+---
+
+## game_players
+
+Slaat player stats op.
+
+| Kolom     | Beschrijving    |
+| --------- | --------------- |
+| user_id   | Speler          |
+| game_id   | Match           |
+| class     | Character class |
+| hp        | Current health  |
+| mana      | Current mana    |
+| defending | Defending state |
+
+---
+
+## abilities
+
+Bevat alle spells en abilities.
+
+---
+
+## game_logs
+
+Slaat combat acties op.
+
+---
+
+# Project Structuur
+
+```txt
+app/
+ ├── Models/
+ ├── Http/
+ ├── Services/
+ │    └── BattleService.php
+ └── ...
+```
+
+---
+
+# BattleService
+
+De game logic wordt beheerd in:
+
+```txt
+app/Services/BattleService.php
+```
+
+Voorbeelden van methods:
+
+```php
+attack()
+heavyAttack()
+castSpell()
+applyEffect()
+nextTurn()
+checkWinner()
+```
+
+---
+
+# MVP Goals
+
+## Eerste versie
+
+* Login/Register
+* Matchmaking
+* Turn system
+* Basic attacks
+* HP system
+* Win/Lose systeem
+
+---
+
+# Toekomstige Features
+
+## Mogelijke uitbreidingen
+
+* Meer classes
+* Meer spells
+* Inventory systeem
+* Ranked mode
+* Match history
+* Sound effects
+* Animaties
+* AI bots
+* Loot systeem
+
+---
+
+# Installatie
+
+## Clone project
+
+```bash
+git clone <repository>
+```
+
+---
+
+## Dependencies installeren
+
+```bash
+composer install
+npm install
+```
+
+---
+
+## Environment file
+
+```bash
+cp .env.example .env
+```
+
+---
+
+## Application key genereren
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## Database migraties
+
+```bash
+php artisan migrate
+```
+
+---
+
+## Frontend starten
+
+```bash
+npm run dev
+```
+
+---
+
+## Laravel server starten
+
+```bash
+php artisan serve
+```
+
+---
+
+# Development Roadmap
+
+## Phase 1
+
+* Authentication
+* Lobby system
+* Create game
+* Join game
+
+---
+
+## Phase 2
+
+* Battle system
+* Turns
+* Damage system
+* Health bars
+
+---
+
+## Phase 3
+
+* Classes
+* Spells
+* Status effects
+* Animaties
+
+---
+
+## Phase 4
+
+* Polish
+* Sound effects
+* Better UI
+* Balancing
+
+---
+
+# Leerdoelen
+
+Met dit project worden de volgende technieken toegepast:
+
+* OOP
+* MVC structuur
+* Database relaties
+* Multiplayer logic
+* State management
+* Laravel services
+* Frontend interaction
+* Game systems
+* CRUD functionaliteit
+
+---
+
+# Auteur
+
+Dungeon Duel is ontwikkeld als schoolproject met Laravel en
