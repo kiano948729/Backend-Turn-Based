@@ -8,9 +8,20 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\BattleController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
+
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+})->name('logout');
 
 Route::middleware(['auth'])->group(function () {
 
@@ -34,5 +45,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profile', [ProfileController::class, 'index'])
         ->name('profile.index');
+
 
 });
