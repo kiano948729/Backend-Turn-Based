@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Models\User;
 use App\Models\GamePlayer;
+use App\Models\GameClass;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -30,20 +31,26 @@ class GameController extends Controller
             'current_turn_player_id' => $startingPlayer,
         ]);
 
+        $selectedClass = GameClass::findOrFail(
+            request('game_class_id')
+        );
+
         GamePlayer::create([
             'game_id' => $game->id,
             'user_id' => Auth::id(),
-            'game_class_id' => 1,
-            'current_hp' => 100,
-            'current_mana' => 50,
+            'game_class_id' => $selectedClass->id,
+            'current_hp' => $selectedClass->base_hp,
+            'current_mana' => $selectedClass->base_mana,
         ]);
+
+        $enemyClass = GameClass::inRandomOrder()->first();
 
         GamePlayer::create([
             'game_id' => $game->id,
             'user_id' => $opponent->id,
-            'game_class_id' => 2,
-            'current_hp' => 100,
-            'current_mana' => 50,
+            'game_class_id' => $enemyClass->id,
+            'current_hp' => $enemyClass->base_hp,
+            'current_mana' => $enemyClass->base_mana,
         ]);
 
         return redirect()->route('games.show', $game);

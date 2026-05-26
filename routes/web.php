@@ -1,29 +1,24 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\BattleController;
 use App\Http\Controllers\FriendController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
+Route::get('/', function () {
+    return view('welcome');
+});
 
-Route::post('/logout', function (Request $request) {
-    Auth::logout();
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect('/');
-})->name('logout');
-
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
@@ -43,8 +38,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/friends', [FriendController::class, 'index'])
         ->name('friends.index');
 
-    Route::get('/profile', [ProfileController::class, 'index'])
-        ->name('profile.index');
-
-
 });
+
+require __DIR__ . '/auth.php';
