@@ -14,4 +14,24 @@
             </div>
         </div>
     </div>
+    <form method="POST" action="{{ route('games.store') }}" class="flex items-center gap-4">
+        @csrf
+
+        <select name="game_class_id" class="rounded-xl border-gray-300">
+
+            @foreach($classes as $class)
+
+                <option value="{{ $class->id }}">
+                    {{ $class->name }}
+                </option>
+
+            @endforeach
+
+        </select>
+
+        <button class="bg-red-600 text-white px-4 py-2 rounded-xl">
+            Create Game
+        </button>
+
+    </form>
 </x-app-layout>

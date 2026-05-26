@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\Game;
+use App\Models\GameClass;
 
 class DashboardController extends Controller
 {
@@ -11,6 +11,11 @@ class DashboardController extends Controller
     {
         $games = Game::latest()->get();
 
-        return view('dashboard', compact('games'));
+        $classes = GameClass::all();
+
+        return view('dashboard', compact(
+            'games',
+            'classes'
+        ));
     }
 }
