@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="h-4 bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-green-500 transition-all duration-500" style="width: {{ $myHpPct }}%"></div>
+                    <div class="h-full bg-green-500 transition-all duration-500" style="width: {{ $myHpPct }}%;"></div>
                 </div>
             </div>
         </div>
@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="h-4 bg-gray-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-red-500 transition-all duration-500" style="width: {{ $enemyHpPct }}%"></div>
+                    <div class="h-full bg-red-500 transition-all duration-500" style="width: {{ $enemyHpPct }}%;"></div>
                 </div>
             </div>
         </div>
