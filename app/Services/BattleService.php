@@ -3,123 +3,190 @@
 namespace App\Services;
 
 use App\Models\Game;
-use App\Models\GamePlayer;
 use App\Models\GameLog;
+use App\Models\GamePlayer;
 
 class BattleService
 {
-    public function attack(Game $game, GamePlayer $attacker, GamePlayer $defender): array
-    {
-        if ($game->current_turn_player_id !== $attacker->user_id) {
-            return ['error' => 'Het is niet jouw beurt.'];
+    public function basicAttack(
+        Game $game,
+        GamePlayer $attacker,
+        GamePlayer $defender
+    ): array {
+        if (!$this->isPlayersTurn($game, $attacker)) {
+            return [
+                'error' => 'Het is niet jouw beurt.',
+            ];
         }
 
-        $attackerClass = $attacker->gameClass;
-        $defenderClass = $defender->gameClass;
+        $damage = $this->calculateAttackDamage(
+            attacker: $attacker,
+            defender: $defender
+        );
 
-        //basis schade berekening
-        $baseDamage = $attackerClass->base_strength ?? 10;
+        $this->applyDamage(
+            defender: $defender,
+            damage: $damage['final_damage']
+        );
 
-        //crit chance
-        $critChance = $attackerClass->crit_chance ?? 10;
-        $isCrit = rand(1, 100) <= $critChance;
-        $damage = $isCrit ? $baseDamage * 2 : $baseDamage;
+        $message = $damage['is_crit']
+            ? "{$attacker->user->name} landt een critical hit op {$defender->user->name} voor {$damage['final_damage']} schade."
+            : "{$attacker->user->name} valt {$defender->user->name} aan voor {$damage['final_damage']} schade.";
 
-        //defense vermindering
-        $defense = $defenderClass->base_defense ?? 5;
+        $this->createLog(
+            game: $game,
+            userId: $attacker->user_id,
+            action: 'attack',
+            message: $message
+        );
 
-        //als defender aan het verdedigen is, verdubbel de defense
-        if ($defender->is_defending) {
-            $defense *= 2;
-        }
-
-        $finalDamage = max(1, $damage - $defense);
-
-        //HP verlagen
-        $defender->current_hp = max(0, $defender->current_hp - $finalDamage);
-        $defender->is_defending = false; //defending reset
-        $defender->save();
-
-        //battle log opslaan
-        $logMessage = $isCrit
-            ? "{$attacker->user->name} voert een CRITICAL hit uit op {$defender->user->name} voor {$finalDamage} schade!"
-            : "{$attacker->user->name} valt {$defender->user->name} aan voor {$finalDamage} schade.";
-
-        GameLog::create([
-            'game_id' => $game->id,
-            'user_id' => $attacker->user_id,
-            'action' => 'attack',
-            'message' => $logMessage,
-        ]);
-
-        //controleer winnaar
         if ($defender->current_hp <= 0) {
-            return $this->endGame($game, $attacker);
+            return $this->finishGame($game, $attacker);
         }
 
-        //beurt wisselen
-        $this->nextTurn($game, $defender);
+        $this->switchTurn($game, $defender);
 
         return [
-            'damage' => $finalDamage,
-            'is_crit' => $isCrit,
-            'message' => $logMessage,
+            'message' => $message,
+            'damage' => $damage['final_damage'],
+            'is_crit' => $damage['is_crit'],
         ];
     }
 
-    public function defend(Game $game, GamePlayer $defender): array
-    {
-        if ($game->current_turn_player_id !== $defender->user_id) {
-            return ['error' => 'Het is niet jouw beurt.'];
+    public function defend(
+        Game $game,
+        GamePlayer $defender
+    ): array {
+        if (!$this->isPlayersTurn($game, $defender)) {
+            return [
+                'error' => 'Het is niet jouw beurt.',
+            ];
         }
 
-        $defender->is_defending = true;
-        $defender->save();
-
-        $logMessage = "{$defender->user->name} neemt een verdedigende houding aan.";
-
-        GameLog::create([
-            'game_id' => $game->id,
-            'user_id' => $defender->user_id,
-            'action' => 'defend',
-            'message' => $logMessage,
+        $defender->update([
+            'is_defending' => true,
         ]);
 
-        //beurt naar tegenstander
+        $message = "{$defender->user->name} neemt een verdedigende houding aan.";
+
+        $this->createLog(
+            game: $game,
+            userId: $defender->user_id,
+            action: 'defend',
+            message: $message
+        );
+
         $opponent = GamePlayer::where('game_id', $game->id)
             ->where('user_id', '!=', $defender->user_id)
             ->first();
 
-        $this->nextTurn($game, $opponent);
-
-        return ['message' => $logMessage];
-    }
-
-    private function nextTurn(Game $game, GamePlayer $nextPlayer): void
-    {
-        $game->current_turn_player_id = $nextPlayer->user_id;
-        $game->save();
-    }
-
-    private function endGame(Game $game, GamePlayer $winner): array
-    {
-        $game->status = 'finished';
-        $game->winner_id = $winner->user_id;
-        $game->save();
-
-        $logMessage = "{$winner->user->name} wint de strijd!";
-
-        GameLog::create([
-            'game_id' => $game->id,
-            'user_id' => $winner->user_id,
-            'action' => 'win',
-            'message' => $logMessage,
-        ]);
+        $this->switchTurn($game, $opponent);
 
         return [
-            'winner' => $winner->user->name,
-            'message' => $logMessage,
+            'message' => $message,
+        ];
+    }
+
+    private function calculateAttackDamage(
+        GamePlayer $attacker,
+        GamePlayer $defender
+    ): array {
+        //base damage
+        $baseDamage = $attacker->gameClass->base_strength ?? 10;
+
+        //crit
+        $critChance = $attacker->gameClass->crit_chance ?? 10;
+
+        $isCrit = rand(1, 100) <= $critChance;
+
+        if ($isCrit) {
+            $baseDamage *= 2;
+        }
+
+        //defense
+        $defense = $defender->gameClass->base_defense ?? 5;
+
+        if ($defender->is_defending) {
+            $defense *= 2;
+        }
+
+        $finalDamage = max(
+            1,
+            $baseDamage - $defense
+        );
+
+        return [
+            'final_damage' => $finalDamage,
+            'is_crit' => $isCrit,
+        ];
+    }
+
+    private function applyDamage(
+        GamePlayer $defender,
+        int $damage
+    ): void {
+        $defender->current_hp = max(
+            0,
+            $defender->current_hp - $damage
+        );
+
+        $defender->is_defending = false;
+
+        $defender->save();
+    }
+
+    private function isPlayersTurn(
+        Game $game,
+        GamePlayer $player
+    ): bool {
+        return $game->current_turn_player_id === $player->user_id;
+    }
+
+    private function switchTurn(
+        Game $game,
+        GamePlayer $nextPlayer
+    ): void {
+        $game->update([
+            'current_turn_player_id' => $nextPlayer->user_id,
+        ]);
+    }
+
+    private function finishGame(
+        Game $game,
+        GamePlayer $winner
+    ): array {
+        $game->update([
+            'status' => 'finished',
+            'winner_id' => $winner->user_id,
+        ]);
+
+        $message = "{$winner->user->name} wint de strijd!";
+
+        $this->createLog(
+            game: $game,
+            userId: $winner->user_id,
+            action: 'win',
+            message: $message
+        );
+
+        return [
             'game_over' => true,
-        ];      
+            'winner' => $winner->user->name,
+            'message' => $message,
+        ];
+    }
+
+    private function createLog(
+        Game $game,
+        int $userId,
+        string $action,
+        string $message
+    ): void {
+        GameLog::create([
+            'game_id' => $game->id,
+            'user_id' => $userId,
+            'action' => $action,
+            'message' => $message,
+        ]);
     }
 }
