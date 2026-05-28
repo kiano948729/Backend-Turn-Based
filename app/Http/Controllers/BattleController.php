@@ -9,56 +9,49 @@ use Illuminate\Support\Facades\Auth;
 
 class BattleController extends Controller
 {
-    protected BattleService $battleService;
-
-    public function __construct(BattleService $battleService)
-    {
-        $this->battleService = $battleService;
-    }
+    public function __construct(protected BattleService $battleService) {}
 
     public function attack(Game $game)
     {
-        if ($game->status === 'finished') {
-            return back();
+        $players = GamePlayer::where('game_id', $game->id)->get();
+
+        $attacker = $players->where('user_id', Auth::id())->first();
+        $defender = $players->where('user_id', '!=', Auth::id())->first();
+
+        if (!$attacker || !$defender) {
+            return back()->with('error', 'Speler niet gevonden.');
         }
 
-        if ($game->current_turn_player_id !== Auth::id()) {
-            abort(403);
+        $result = $this->battleService->attack($game, $attacker, $defender);
+
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
         }
 
-        $player = GamePlayer::where('game_id', $game->id)
-            ->where('user_id', Auth::id())
-            ->first();
-
-        if (!$player) {
-            abort(403);
+        if (isset($result['game_over'])) {
+            return redirect()->route('games.show', $game)
+                ->with('success', $result['message']);
         }
 
-        $this->battleService->attack($game, $player);
-
-        return back();
+        return back()->with('battle_result', $result['message']);
     }
 
     public function defend(Game $game)
     {
-        if ($game->status === 'finished') {
-            return back();
-        }
-
-        if ($game->current_turn_player_id !== Auth::id()) {
-            abort(403);
-        }
-
         $player = GamePlayer::where('game_id', $game->id)
             ->where('user_id', Auth::id())
             ->first();
 
         if (!$player) {
-            abort(403);
+            return back()->with('error', 'Speler niet gevonden.');
         }
 
-        $this->battleService->defend($game, $player);
+        $result = $this->battleService->defend($game, $player);
 
-        return back();
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        return back()->with('battle_result', $result['message']);
     }
 }

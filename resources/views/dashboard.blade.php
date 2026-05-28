@@ -6,32 +6,68 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            {{-- ACTIEVE GAME --}}
+            @if($activeGame)
+                <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-5 flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-yellow-800">Je hebt een actief gevecht!</p>
+                        <p class="text-sm text-yellow-600">Ga terug naar de arena.</p>
+                    </div>
+                    <a href="{{ route('games.show', $activeGame) }}"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                        Ga naar gevecht →
+                    </a>
                 </div>
+            @endif
+
+            {{-- NIEUW SPEL --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">Nieuw gevecht starten</h3>
+                <p class="text-sm text-gray-500 mb-5">Kies een klasse en ga de arena in.</p>
+
+                <form method="POST" action="{{ route('games.store') }}">
+                    @csrf
+
+                    <div class="mb-4">
+                        <label for="game_class_id" class="block text-sm font-medium text-gray-700 mb-1">
+                            Kies je klasse
+                        </label>
+                        <select name="game_class_id" id="game_class_id"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500">
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}">
+                                    {{ $class->name }}
+                                    — ❤ {{ $class->base_hp }} HP
+                                    · ✦ {{ $class->base_mana }} Mana
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    @if($classes->isEmpty())
+                        <p class="text-sm text-red-500 mb-3">
+                            Geen klassen gevonden in de database. Voer de seeder uit.
+                        </p>
+                    @endif
+
+                    <button type="submit"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg transition">
+                        ⚔ Gevecht starten
+                    </button>
+                </form>
+
+                {{-- Errors --}}
+                @if($errors->any())
+                    <div class="mt-3 text-sm text-red-600">
+                        @foreach($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
+                @endif
             </div>
+
         </div>
     </div>
-    <form method="POST" action="{{ route('games.store') }}" class="flex items-center gap-4">
-        @csrf
-
-        <select name="game_class_id" class="rounded-xl border-gray-300">
-
-            @foreach($classes as $class)
-
-                <option value="{{ $class->id }}">
-                    {{ $class->name }}
-                </option>
-
-            @endforeach
-
-        </select>
-
-        <button class="bg-red-600 text-white px-4 py-2 rounded-xl">
-            Create Game
-        </button>
-
-    </form>
 </x-app-layout>
