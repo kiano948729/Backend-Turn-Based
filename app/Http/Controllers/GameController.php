@@ -59,20 +59,19 @@ class GameController extends Controller
     public function show(Game $game)
     {
         $players = GamePlayer::where('game_id', $game->id)
+            ->with(['gameClass', 'user'])
             ->get();
 
-        $currentPlayer = $players
-            ->where('user_id', Auth::id())
-            ->first();
+        $currentPlayer = $players->where('user_id', Auth::id())->first();
+        $enemyPlayer = $players->where('user_id', '!=', Auth::id())->first();
 
-        $enemyPlayer = $players
-            ->where('user_id', '!=', Auth::id())
-            ->first();
+        $isMyTurn = $game->current_turn_player_id === Auth::id();
 
         return view('games.show', compact(
             'game',
             'currentPlayer',
-            'enemyPlayer'
+            'enemyPlayer',
+            'isMyTurn',
         ));
     }
 }
