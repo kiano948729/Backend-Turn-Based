@@ -9,8 +9,7 @@
     $enemyClass = strtolower($enemyPlayer->gameClass->name);
 @endphp
 
-<div class="bg-[#111827] border border-gray-800 rounded-2xl p-8 shadow-2xl overflow-hidden">
-
+<div class="bg-[url('../../public/gifs/background.gif')] bg-cover bg-center border border-gray-800 rounded-2xl p-8 shadow-2xl overflow-hidden">
     <!-- arena -->
     <div class="relative flex items-center justify-between gap-10 min-h-[320px]">
 

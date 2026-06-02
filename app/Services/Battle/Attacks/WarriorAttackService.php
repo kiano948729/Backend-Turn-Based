@@ -14,13 +14,13 @@ class WarriorAttackService
         return match ($attack) {
 
             'heavy_slash' => [
-                'damage' => rand(25, 35),
+                'damage' => rand(25, 45),
                 'message' => "{$attacker->user->name} gebruikt heavy slash.",
             ],
 
             'shield_bash' => [
-                'damage' => rand(10, 15),
-                'skip_turn' => true,
+                'damage' => rand(20, 30),
+                'self_damage' => 5,
                 'message' => "{$attacker->user->name} gebruikt shield bash.",
             ],
 

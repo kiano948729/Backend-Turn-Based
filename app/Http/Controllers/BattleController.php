@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\GamePlayer;
-use App\Services\BattleService;
+use App\Services\Battle\BattleService;
 use Illuminate\Support\Facades\Auth;
 
 class BattleController extends Controller
@@ -14,21 +14,27 @@ class BattleController extends Controller
     ) {
     }
 
-    public function attack(Game $game)
-    {
+    public function attack(
+        Game $game,
+        string $attack
+    ) {
         [$attacker, $defender] = $this->getPlayers($game);
 
         if (!$attacker || !$defender) {
             return back()->with('error', 'Speler niet gevonden.');
         }
 
-        $result = $this->battleService->basicAttack(
+        $result = $this->battleService->useAttack(
             game: $game,
             attacker: $attacker,
-            defender: $defender
+            defender: $defender,
+            attack: $attack
         );
 
-        return $this->handleBattleResult($game, $result);
+        return $this->handleBattleResult(
+            game: $game,
+            result: $result
+        );
     }
 
     public function defend(Game $game)

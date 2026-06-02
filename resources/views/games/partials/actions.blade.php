@@ -1,52 +1,71 @@
-<div class="bg-[#111827] border border-gray-800 rounded-2xl p-6 shadow-xl">
+@php
+    $class = strtolower($currentPlayer->gameClass->name);
+
+    $attacks = match ($class) {
+
+        'mage' => [
+            'fireball' => 'Fireball',
+            'frost_nova' => 'Frost Nova',
+            'arcane_blast' => 'Arcane Blast',
+            'you_shall_not_pass' => 'You shall not pass',
+        ],
+
+        'warrior' => [
+            'heavy_slash' => 'Heavy Slash',
+            'shield_bash' => 'Shield Bash',
+            'berserk' => 'Berserk',
+        ],
+
+        'rogue' => [
+            'backstab' => 'Backstab',
+            'poison_dagger' => 'Poison Dagger',
+            'shadow_strike' => 'Shadow Strike',
+        ],
+
+        default => [],
+    };
+@endphp
+
+<div class="border rounded p-4">
 
     @if($game->status === 'finished')
 
-        <p class="text-center text-gray-400">
-            Het gevecht is afgelopen.
-        </p>
+        <p>Het gevecht is voorbij.</p>
 
     @elseif($isMyTurn)
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-wrap gap-2">
 
-            <form method="POST" action="{{ route('battle.attack', $game) }}">
-                @csrf
+            @foreach($attacks as $key => $label)
 
-                <button type="submit"
-                    class="w-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all duration-150 text-white font-bold py-4 rounded-xl">
-                    Aanvallen
-                </button>
-            </form>
+                <form method="POST" action="{{ route('battle.attack', [$game, $key]) }}">
+                    @csrf
+
+                    <button type="submit" class="border px-4 py-2 rounded">
+                        {{ $label }}
+                    </button>
+
+                </form>
+
+            @endforeach
 
             <form method="POST" action="{{ route('battle.defend', $game) }}">
                 @csrf
 
-                <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all duration-150 text-white font-bold py-4 rounded-xl">
-                    Verdedigen
+                <button type="submit" class="border px-4 py-2 rounded">
+                    Defend
                 </button>
+
             </form>
 
         </div>
 
     @else
 
-        <div class="grid grid-cols-2 gap-4">
-
-            <button disabled class="w-full bg-gray-800 text-gray-500 font-bold py-4 rounded-xl cursor-not-allowed">
-                Aanvallen
-            </button>
-
-            <button disabled class="w-full bg-gray-800 text-gray-500 font-bold py-4 rounded-xl cursor-not-allowed">
-                Verdedigen
-            </button>
-
-        </div>
-
-        <p class="text-center text-gray-500 text-sm mt-4">
+        <p>
             Wachten op {{ $enemyPlayer->user->name }}
         </p>
 
     @endif
+
 </div>
