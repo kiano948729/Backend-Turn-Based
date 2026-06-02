@@ -1,17 +1,15 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
     <div class="bg-white rounded-2xl shadow-2xl p-10 text-center max-w-sm w-full mx-4">
 
-        <div class="text-5xl mb-4">{{ $iWon ? 'win' : 'verlies' }}</div>
-
         <h2 class="text-2xl font-bold mb-1 {{ $iWon ? 'text-green-700' : 'text-red-700' }}">
-            {{ $iWon ? 'Gewonnen!' : 'Verloren...' }}
+            {{ $iWon ? 'Gewonnen' : 'Verloren' }}
         </h2>
 
         <p class="text-gray-500 text-sm mb-6">
             @if($iWon)
-                Jij staat als overwinnaar op het slagveld.
+                Je hebt gewonnen
             @else
-                {{ $enemyPlayer->user->name }} heeft jou verslagen.
+                {{ $enemyPlayer->user->name }} heeft jou verslagen
             @endif
         </p>
 
