@@ -1,14 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
+            Dashboard
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- ACTIEVE GAME --}}
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-300 text-red-800 rounded-lg px-4 py-3 text-sm">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if($activeGame)
                 <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-5 flex items-center justify-between">
                     <div>
@@ -22,7 +27,6 @@
                 </div>
             @endif
 
-            {{-- NIEUW SPEL --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-1">Nieuw gevecht starten</h3>
                 <p class="text-sm text-gray-500 mb-5">Kies een klasse en ga de arena in.</p>
@@ -38,17 +42,34 @@
                             class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500">
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}">
-                                    {{ $class->name }}
-                                    {{ $class->base_hp }} HP
-                                    {{ $class->base_mana }} Mana
+                                    {{ $class->name }} {{ $class->base_hp }} HP / {{ $class->base_mana }} Mana
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
+                    <div class="mb-5">
+                        <label for="friend_id" class="block text-sm font-medium text-gray-700 mb-1">
+                            Tegenstander (optioneel)
+                        </label>
+                        <select name="friend_id" id="friend_id"
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500">
+                            <option value="">Willekeurige speler</option>
+                            @foreach($friends as $friend)
+                                <option value="{{ $friend->id }}">{{ $friend->name }}</option>
+                            @endforeach
+                        </select>
+                        @if($friends->isEmpty())
+                            <p class="text-xs text-gray-400 mt-1">
+                                Nog geen vrienden? <a href="{{ route('friends.index') }}"
+                                    class="underline text-red-500">Voeg er een toe.</a>
+                            </p>
+                        @endif
+                    </div>
+
                     @if($classes->isEmpty())
                         <p class="text-sm text-red-500 mb-3">
-                            Geen klassen gevonden in de database. Voer de seeder uit.
+                            Geen klassen gevonden. Voer de seeder uit.
                         </p>
                     @endif
 
@@ -57,17 +78,9 @@
                         Gevecht starten
                     </button>
                 </form>
-
-                {{-- Errors --}}
-                @if($errors->any())
-                    <div class="mt-3 text-sm text-red-600">
-                        @foreach($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
-                @endif
             </div>
 
         </div>
     </div>
+
 </x-app-layout>
