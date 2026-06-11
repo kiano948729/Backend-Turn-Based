@@ -2,7 +2,6 @@
     $class = strtolower($currentPlayer->gameClass->name);
 
     $attacks = match ($class) {
-
         'mage' => [
             'fireball' => 'Fireball',
             'frost_nova' => 'Frost Nova',
@@ -24,21 +23,28 @@
 
         default => [],
     };
+
+    $animations = config('attack_animations');
 @endphp
 
 <div class="border rounded p-4">
 
-    @if($game->status === 'finished')
+    @if ($game->status === 'finished')
 
         <p>Het gevecht is voorbij.</p>
 
-    @elseif($isMyTurn)
+    @elseif ($isMyTurn)
 
         <div class="flex flex-wrap gap-2">
 
-            @foreach($attacks as $key => $label)
+            @foreach ($attacks as $key => $label)
 
-                <form method="POST" action="{{ route('battle.attack', [$game, $key]) }}">
+                @php
+                    $anim = $animations[$key] ?? null;
+                @endphp
+
+                <form method="POST" action="{{ route('battle.attack', [$game, $key]) }}" class="attack-form"
+                    data-gif="{{ $anim['gif'] ?? '' }}" data-duration="{{ $anim['duration'] ?? 0 }}">
                     @csrf
 
                     <button type="submit" class="border px-4 py-2 rounded">
@@ -62,9 +68,7 @@
 
     @else
 
-        <p>
-            Wachten op {{ $enemyPlayer->user->name }}
-        </p>
+        <p>Wachten op {{ $enemyPlayer->user->name }}</p>
 
     @endif
 
