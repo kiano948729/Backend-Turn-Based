@@ -13,7 +13,11 @@ class GamePlayer extends Model
         'current_hp',
         'current_mana',
         'is_defending',
-    ];
+        'is_stunned',
+        'is_poisoned',
+        'poison_turns',
+        'dodge_chance',
+    ];  
     public function user()
     {
         return $this->belongsTo(User::class);

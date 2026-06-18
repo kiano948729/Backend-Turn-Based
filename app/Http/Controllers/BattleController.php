@@ -39,7 +39,7 @@ class BattleController extends Controller
 
     public function defend(Game $game)
     {
-        $player = $this->getCurrentPlayer($game);
+        [$player] = $this->getPlayers($game);
 
         if (!$player) {
             return back()->with('error', 'Speler niet gevonden.');

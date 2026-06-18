@@ -47,6 +47,10 @@ class GameController extends Controller
 
     public function show(Game $game)
     {
+        $isParticipant = $game->players()->where('user_id', Auth::id())->exists();
+        if (!$isParticipant)
+            abort(403);
+        
         $players = GamePlayer::where('game_id', $game->id)
             ->with(['user', 'gameClass'])
             ->get();

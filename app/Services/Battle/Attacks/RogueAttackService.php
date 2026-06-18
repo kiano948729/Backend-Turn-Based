@@ -30,6 +30,9 @@ class RogueAttackService
                 'dodge' => true,
                 'message' => "{$attacker->user->name} verdwijnt in de schaduw.",
             ],
+            default => [
+                'error' => 'Attack bestaat niet.',
+            ],
         };
     }
 }

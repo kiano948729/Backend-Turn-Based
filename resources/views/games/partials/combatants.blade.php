@@ -10,10 +10,8 @@
 @endphp
 
 <div class="bg-[url('../../public/gifs/background.gif')] bg-cover bg-center border border-gray-800 rounded-2xl p-8 shadow-2xl overflow-hidden">
-    <!-- arena -->
     <div class="relative flex items-center justify-between gap-10 min-h-[320px]">
 
-        <!-- speler -->
         <div class="w-1/2 flex flex-col items-center">
 
             <div class="mb-4 text-center">
@@ -26,7 +24,6 @@
                 </p>
             </div>
 
-            <!-- gifs -->
             <div class="relative">
                 <img src="{{ asset('gifs/' . $myClass . '.gif') }}" alt="{{ $currentPlayer->gameClass->name }}"
                     class="w-56 h-56 object-contain drop-shadow-[0_0_35px_rgba(255,255,255,0.15)]">
@@ -36,7 +33,6 @@
                 @endif
             </div>
 
-            <!-- hp -->
             <div class="w-full max-w-xs mt-6">
                 <div class="flex justify-between text-sm text-gray-300 mb-2">
                     <span>HP</span>
@@ -53,7 +49,6 @@
             </div>
         </div>
 
-        <!-- vs -->
         <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
 
             <div class="text-5xl font-black text-white opacity-20 tracking-widest">
@@ -62,7 +57,6 @@
 
         </div>
 
-        <!-- tegenstander -->
         <div class="w-1/2 flex flex-col items-center">
 
             <div class="mb-4 text-center">
@@ -75,7 +69,6 @@
                 </p>
             </div>
 
-            <!-- gifs -->
             <div class="relative">
                 <img src="{{ asset('gifs/' . $enemyClass . '.gif') }}" alt="{{ $enemyPlayer->gameClass->name }}"
                     class="w-56 h-56 object-contain scale-x-[-1] drop-shadow-[0_0_35px_rgba(255,0,0,0.15)]">
@@ -85,7 +78,6 @@
                 @endif
             </div>
 
-            <!-- hp -->
             <div class="w-full max-w-xs mt-6">
                 <div class="flex justify-between text-sm text-gray-300 mb-2">
                     <span>HP</span>

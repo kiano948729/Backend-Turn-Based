@@ -29,6 +29,9 @@ class WarriorAttackService
                 'self_damage' => 10,
                 'message' => "{$attacker->user->name} gaat berserk.",
             ],
+            default => [
+                'error' => 'Attack bestaat niet.',
+            ],
         };
     }
 }
